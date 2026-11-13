@@ -1,0 +1,317 @@
+@import "tailwindcss";
+
+/* Colores de la marca. Para adaptar la tienda, cambia estos valores (y los de marca.config.ts) por los del negocio.
+   Modo claro: fondos crema y el color principal (--color-tinta) en títulos, texto, botones y selecciones.
+   Modo oscuro: fondo y tarjetas oscuros, con el acento (--color-dorado) encima. */
+@theme {
+  --color-niebla: #f4f2ee;
+  --color-vidrio: #fcfbf9;
+  --color-tinta: #1e2a33;
+  --color-humo: #5e6670;
+  --color-linea: #ddd8cf;
+  --color-dorado: #7a5a2e;
+  --color-dorado-claro: #efe4d2;
+  --color-alerta: #a3352b;
+  --color-ok: #3d6b4f;
+  /* Marco de las fotos: blanco en ambos modos para que las fotos con fondo blanco no muestren bordes. */
+  --color-foto: #ffffff;
+
+  /* Títulos: Castoro Titling, serifa de titulares de trazos firmes (Bodoni Moda tenía líneas tan finas que en
+     celulares y en modo claro se perdían). Solo tiene mayúsculas y un grosor: no va en párrafos largos. */
+  --font-display: "Castoro Titling", Georgia, serif;
+  /* Solo el titular de la portada ("Tu próximo perfume te está esperando."). */
+  --font-portada: "Old Standard TT", Georgia, serif;
+  --font-sans: "Hanken Grotesk", system-ui, sans-serif;
+
+  /* Escala de texto un escalón más grande que la de Tailwind por defecto. */
+  --text-xs: 0.875rem;
+  --text-xs--line-height: calc(1.25 / 0.875);
+  --text-sm: 1rem;
+  --text-sm--line-height: calc(1.5 / 1);
+  --text-base: 1.125rem;
+  --text-base--line-height: calc(1.75 / 1.125);
+  --text-lg: 1.25rem;
+  --text-lg--line-height: calc(1.75 / 1.25);
+  --text-xl: 1.375rem;
+  --text-xl--line-height: calc(1.875 / 1.375);
+  --text-2xl: 1.625rem;
+  --text-2xl--line-height: calc(2.125 / 1.625);
+
+  /* Movimiento: arranca rápido y se posa suave. Una sola curva para toda la tienda. */
+  --ease-elegante: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-entrada: entrada 0.6s var(--ease-elegante) both;
+  --animate-cambio: cambio 0.45s var(--ease-elegante);
+  --animate-pop: pop 0.5s var(--ease-elegante);
+  --animate-onda: onda 0.9s var(--ease-elegante) forwards;
+  --animate-trazo: trazo 0.4s var(--ease-elegante) 0.1s both;
+
+  /* Aparece subiendo un poco. */
+  @keyframes entrada { from { opacity: 0; translate: 0 12px; } }
+  /* Cambio de un valor (precio al pasar de divisas a bolívares). */
+  @keyframes cambio { from { opacity: 0; filter: blur(3px); translate: 0 4px; } }
+  /* Contador del carrito al sumar. */
+  @keyframes pop { 0% { scale: 0.4; opacity: 0; } 60% { scale: 1.15; opacity: 1; } 100% { scale: 1; } }
+  /* Onda dorada alrededor del botón del carrito. */
+  @keyframes onda {
+    from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-dorado) 55%, transparent); }
+    to { box-shadow: 0 0 0 14px transparent; }
+  }
+  /* Palomita que se dibuja (stroke-dasharray de 24). */
+  @keyframes trazo { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+  @keyframes girar { from { rotate: -90deg; scale: 0.6; opacity: 0; } }
+}
+
+/* Modo oscuro: sigue al sistema salvo que el usuario elija otro con el botón (data-theme en <html>). */
+@layer base {
+  :root { color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-niebla: #14110d;
+      --color-vidrio: #1f1b16;
+      --color-tinta: #f1ece4;
+      --color-humo: #a9a196;
+      --color-linea: #36302a;
+      --color-dorado: #c9a46a;
+      --color-dorado-claro: #3a2f22;
+      --color-alerta: #e57368;
+      --color-ok: #7fbf95;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --color-niebla: #14110d;
+    --color-vidrio: #1f1b16;
+    --color-tinta: #f1ece4;
+    --color-humo: #a9a196;
+    --color-linea: #36302a;
+    --color-dorado: #c9a46a;
+    --color-dorado-claro: #3a2f22;
+    --color-alerta: #e57368;
+    --color-ok: #7fbf95;
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  /* Permite animar alturas hasta "auto" (secciones plegables). */
+  :root { interpolate-size: allow-keywords; }
+  html { background: var(--color-niebla); color: var(--color-tinta); }
+  body { font-family: var(--font-sans); font-size: 18px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.15; letter-spacing: 0.01em; }
+  /* Castoro Titling viene en un solo grosor: que el navegador no le invente una negrita (la cursiva inclinada
+     sí se permite: es la del "&" del logo de texto). */
+  h1, h2, h3, .font-display { font-synthesis-weight: none; }
+  :focus-visible { outline: 2px solid var(--color-dorado); outline-offset: 2px; border-radius: 4px; }
+  ::selection { background: var(--color-dorado-claro); }
+  /* Scrollbars con los colores del tema: igual el de la página que el de listas y tablas con scroll propio. */
+  * { scrollbar-color: color-mix(in srgb, var(--color-humo) 45%, transparent) transparent; }
+  *:not(html) { scrollbar-width: thin; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+}
+
+@layer components {
+  /* Botones: se hunden levemente al pulsarlos. */
+  .boton { @apply inline-flex items-center justify-center gap-2 rounded-full bg-tinta px-5 py-3 text-sm font-semibold text-vidrio transition-[opacity,background-color,scale] duration-300 ease-elegante hover:opacity-90 active:not-disabled:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40; }
+  .boton-sec { @apply inline-flex items-center justify-center gap-2 rounded-full border border-tinta/25 px-4 py-2 text-sm font-semibold text-tinta transition-[background-color,border-color,scale] duration-300 ease-elegante hover:bg-tinta/5 active:not-disabled:scale-[0.96] disabled:opacity-40; }
+  .campo { @apply w-full rounded-lg border border-linea bg-vidrio px-3 py-2.5 text-[17px] text-tinta transition-[border-color,box-shadow] duration-300 ease-elegante placeholder:text-humo/70 focus:border-tinta focus:shadow-[0_0_0_3px_var(--color-dorado-claro)] focus:outline-none; }
+  /* Píldoras de opciones (filtros, método de pago, entrega). */
+  .opcion { @apply transition-[background-color,border-color,color,scale] duration-300 ease-elegante active:scale-[0.96]; }
+  /* Listas desplegables: colores del tema en cualquier navegador; estilo completo donde se soporta base-select (Chrome/Edge). */
+  select.campo option { background-color: var(--color-vidrio); color: var(--color-tinta); }
+  @supports (appearance: base-select) {
+    select.campo, select.campo::picker(select) { appearance: base-select; }
+    select.campo { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; cursor: pointer; }
+    select.campo::picker-icon { color: var(--color-dorado); transition: rotate 0.3s var(--ease-elegante); }
+    select.campo:open::picker-icon { rotate: 180deg; }
+    select.campo::picker(select) {
+      margin-block: 0.375rem;
+      padding: 0.375rem;
+      max-height: 20rem;
+      overflow-y: auto;
+      border: 1px solid var(--color-linea);
+      border-radius: 1rem;
+      background: var(--color-vidrio);
+      color: var(--color-tinta);
+      box-shadow: 0 16px 36px -14px rgb(0 0 0 / 0.35);
+      /* Se despliega bajando y apareciendo; al cerrar, el camino inverso. */
+      transition: opacity 0.25s var(--ease-elegante), translate 0.25s var(--ease-elegante),
+        display 0.25s allow-discrete, overlay 0.25s allow-discrete;
+    }
+    select.campo:not(:open)::picker(select) { opacity: 0; translate: 0 -6px; }
+    @starting-style { select.campo:open::picker(select) { opacity: 0; translate: 0 -6px; } }
+    select.campo option { gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.625rem; cursor: pointer; transition: background-color 0.15s; }
+    select.campo option:hover, select.campo option:focus-visible { background-color: var(--color-dorado-claro); outline: none; }
+    select.campo option:checked { color: var(--color-dorado); font-weight: 600; }
+    select.campo option::checkmark { color: var(--color-dorado); }
+  }
+  .etiqueta { @apply mb-1 block text-sm font-medium text-humo; }
+  .tarjeta { @apply rounded-2xl border border-linea bg-vidrio; }
+  .tabla { @apply w-full text-left text-sm; }
+  .tabla th { @apply border-b border-linea px-3 py-2 font-medium text-humo; }
+  /* Íconos del botón de tema: envoltorios con display: contents para que su contenido se alinee dentro del botón. */
+  .icono-luna { display: contents; }
+  .icono-sol { display: none; }
+  :root[data-theme="dark"] .icono-sol { display: contents; }
+  :root[data-theme="dark"] .icono-luna { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .icono-sol { display: contents; }
+    :root:not([data-theme="light"]) .icono-luna { display: none; }
+  }
+  .tabla td { @apply border-b border-linea/70 px-3 py-2.5 align-top; }
+
+  /* Ícono del tema: gira al aparecer. */
+  .icono-luna svg, .icono-sol svg { animation: girar 0.6s var(--ease-elegante); }
+
+  /* Avisos de éxito o error: entran suaves. */
+  [role="status"], [role="alert"] { animation: var(--animate-entrada); }
+
+  /* Carrito vacío: el frasco cae rebotando, se mece y suelta unas bocanadas de perfume. */
+  .frasco-vacio {
+    transform-origin: 50% 100%;
+    animation: frasco-cae 0.8s var(--ease-elegante) 0.25s both, frasco-mece 1.4s ease-in-out 1.05s 2;
+  }
+  .bocanada { opacity: 0; animation: bocanada 1.8s ease-out both 3; }
+  /* Pantalla de carga: el mismo frasco, pero se mece y suelta bocanadas sin parar. */
+  .frasco-continuo .frasco-vacio { animation-iteration-count: 1, infinite; }
+  .frasco-continuo .bocanada { animation-iteration-count: infinite; }
+  @keyframes frasco-cae {
+    0% { translate: 0 -60px; rotate: -12deg; opacity: 0; }
+    55% { translate: 0 6px; rotate: 4deg; opacity: 1; scale: 1.04 0.94; }
+    75% { translate: 0 -4px; rotate: -2deg; scale: 0.98 1.03; }
+    100% { translate: 0 0; rotate: 0deg; scale: 1; }
+  }
+  @keyframes frasco-mece { 25% { rotate: -6deg; } 75% { rotate: 6deg; } }
+  @keyframes bocanada {
+    0% { opacity: 0; translate: 0 0; scale: 0.4; }
+    25% { opacity: 0.8; }
+    100% { opacity: 0; translate: var(--deriva, 0px) -46px; scale: 1.5; }
+  }
+
+  /* Panel: sección recién guardada (destello dorado) y error (sacudida breve). */
+  .destello { animation: destello 1.8s var(--ease-elegante); }
+  @keyframes destello {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-dorado) 0%, transparent); }
+    20% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-dorado) 45%, transparent); border-color: var(--color-dorado); }
+    100% { box-shadow: 0 0 0 14px transparent; }
+  }
+  .aviso-error { animation: entrada 0.5s var(--ease-elegante) both, sacudir 0.5s ease-in-out 0.15s; }
+  @keyframes sacudir { 20%, 60% { translate: -5px 0; } 40%, 80% { translate: 5px 0; } }
+  /* Pestaña que está cargando: un brillo la recorre. */
+  .brillo-pestana {
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-dorado) 22%, transparent), transparent);
+    animation: brillo 1s ease-in-out infinite;
+  }
+  @keyframes brillo { to { translate: 300% 0; } }
+
+  /* Tablas del panel: al filtrar o cambiar de página, las filas caen una tras otra, desvaneciéndose. */
+  .fila-entra { animation: fila-entra 0.45s var(--ease-elegante) both; }
+  @keyframes fila-entra { from { opacity: 0; translate: 0 -10px; } }
+
+  /* Secciones plegables (<details>): se abren y cierran deslizando. */
+  details::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition: block-size 0.4s var(--ease-elegante), content-visibility 0.4s allow-discrete;
+  }
+  details[open]::details-content { block-size: auto; }
+}
+
+/* ---------------------------------------------------------------------
+   Transiciones de vista (React <ViewTransition>, ver node_modules/next/dist/docs/01-app/02-guides/view-transitions.md).
+   Sin soporte del navegador, la página cambia sin animar.
+   --------------------------------------------------------------------- */
+/* Los clics durante la animación llegan a la página. */
+::view-transition { pointer-events: none; }
+
+/* Cambio de página o de tema: fundido corto. */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.35s; }
+
+/* Foto del perfume que viaja de la tarjeta a su ficha (y de vuelta). */
+::view-transition-group(.morph) { animation-duration: 0.5s; animation-timing-function: var(--ease-elegante); }
+::view-transition-image-pair(.morph) { animation-name: via-blur; }
+@keyframes via-blur { 30% { filter: blur(3px); } }
+
+/* Producto que sale del carrito. */
+/* Panel: cambio de pestaña. Hacia abajo en el menú, el contenido sube; hacia arriba, baja. */
+::view-transition-old(.pestana-adelante) { animation: panel-sale-arriba 0.2s ease-in both; }
+::view-transition-new(.pestana-adelante) { animation: panel-entra-abajo 0.5s var(--ease-elegante) 0.12s both; }
+::view-transition-old(.pestana-atras) { animation: panel-sale-abajo 0.2s ease-in both; }
+::view-transition-new(.pestana-atras) { animation: panel-entra-arriba 0.5s var(--ease-elegante) 0.12s both; }
+::view-transition-old(.panel-suave) { animation: panel-sale-arriba 0.15s ease-in both; }
+::view-transition-new(.panel-suave) { animation: panel-entra-abajo 0.45s var(--ease-elegante) 0.1s both; }
+@keyframes panel-sale-arriba { to { opacity: 0; translate: 0 -16px; filter: blur(2px); } }
+@keyframes panel-sale-abajo { to { opacity: 0; translate: 0 16px; filter: blur(2px); } }
+@keyframes panel-entra-abajo { from { opacity: 0; translate: 0 28px; filter: blur(3px); } }
+@keyframes panel-entra-arriba { from { opacity: 0; translate: 0 -28px; filter: blur(3px); } }
+/* La barra dorada de la pestaña activa se desliza a la nueva. */
+::view-transition-group(.indicador) { animation-duration: 0.5s; animation-timing-function: var(--ease-elegante); }
+
+/* Producto que sale del carrito: salta, se tambalea y cae girando. */
+::view-transition-old(.salida-item) { animation: salida-item 0.65s both; transform-origin: 30% 100%; }
+@keyframes salida-item {
+  0% { translate: 0 0; rotate: 0deg; animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  22% { translate: 0 -14px; rotate: -4deg; scale: 1.02; animation-timing-function: ease-in-out; }
+  38% { translate: 0 -10px; rotate: 3deg; animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  100% { translate: 40px 140px; rotate: 18deg; scale: 0.8; opacity: 0; }
+}
+/* Los demás productos suben a ocupar el lugar, con un pequeño rebote. */
+::view-transition-group(.reacomodo) { animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); animation-duration: 0.55s; animation-delay: 0.15s; }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* Modal de confirmación: aparece subiendo sobre un fondo que se oscurece. */
+@layer components {
+  .dialogo {
+    margin: auto;
+    width: min(28rem, calc(100% - 2rem));
+    border: 1px solid var(--color-linea);
+    border-radius: 1.25rem;
+    background: var(--color-vidrio);
+    color: var(--color-tinta);
+    box-shadow: 0 24px 48px -16px rgb(0 0 0 / 0.45);
+    transition: opacity 0.3s var(--ease-elegante), translate 0.3s var(--ease-elegante), scale 0.3s var(--ease-elegante);
+  }
+  .dialogo::backdrop { background: rgb(18 10 33 / 0.5); backdrop-filter: blur(3px); transition: opacity 0.3s var(--ease-elegante); }
+  @starting-style {
+    .dialogo[open] { opacity: 0; translate: 0 12px; scale: 0.97; }
+    .dialogo[open]::backdrop { opacity: 0; }
+  }
+}
+
+/* Barra de carga del panel: un tramo dorado que la recorre de lado a lado. */
+@layer components {
+  .barra-carga { animation: barra-carga 1.1s var(--ease-elegante) infinite; }
+  @keyframes barra-carga { from { translate: -100% 0; } to { translate: 300% 0; } }
+}
+
+/* Logo de la portada: aparece creciendo desde abajo y luego flota muy despacio. */
+@layer components {
+  .logo-portada {
+    animation: logo-aparece 0.9s var(--ease-elegante) both, logo-flota 6s ease-in-out 0.9s infinite;
+  }
+  @keyframes logo-aparece { from { opacity: 0; translate: 0 16px; scale: 0.92; } }
+  @keyframes logo-flota { 50% { translate: 0 -6px; } }
+}
+
+/* Catálogo: al cambiar de página, la cuadrícula sale hacia un lado y la nueva entra por el otro, desenfocándose. */
+::view-transition-old(.pagina-adelante) { animation: pagina-sale-izquierda 0.3s ease-in both; }
+::view-transition-new(.pagina-adelante) { animation: pagina-entra-derecha 0.6s var(--ease-elegante) 0.12s both; }
+::view-transition-old(.pagina-atras) { animation: pagina-sale-derecha 0.3s ease-in both; }
+::view-transition-new(.pagina-atras) { animation: pagina-entra-izquierda 0.6s var(--ease-elegante) 0.12s both; }
+@keyframes pagina-sale-izquierda { to { opacity: 0; translate: -48px 0; filter: blur(4px); } }
+@keyframes pagina-sale-derecha { to { opacity: 0; translate: 48px 0; filter: blur(4px); } }
+@keyframes pagina-entra-derecha { from { opacity: 0; translate: 48px 0; filter: blur(4px); } }
+@keyframes pagina-entra-izquierda { from { opacity: 0; translate: -48px 0; filter: blur(4px); } }
+/* Mientras llega la página nueva, los resultados se atenúan un poco. */
+.resultados { transition: opacity 0.3s var(--ease-elegante); }
+.resultados[data-cargando] { opacity: 0.55; }
+/* Al filtrar: los resultados viejos bajan y se desvanecen; los nuevos suben desde abajo, desenfocándose igual. */
+::view-transition-old(.filtro) { animation: filtro-sale 0.25s ease-in both; }
+::view-transition-new(.filtro) { animation: filtro-entra 0.55s var(--ease-elegante) 0.1s both; }
+@keyframes filtro-sale { to { opacity: 0; translate: 0 16px; filter: blur(4px); } }
+@keyframes filtro-entra { from { opacity: 0; translate: 0 24px; filter: blur(4px); } }
